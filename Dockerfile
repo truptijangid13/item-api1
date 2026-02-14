@@ -3,13 +3,11 @@
 # ===========================
 FROM maven:3.9.9-eclipse-temurin-17 AS build
 
-# Set working directory
 WORKDIR /app
 
-# Copy all project files
 COPY . .
 
-# Build the app and skip tests for faster builds
+# Build the app using Maven directly (no mvnw)
 RUN mvn clean package -DskipTests
 
 # ===========================
@@ -17,14 +15,11 @@ RUN mvn clean package -DskipTests
 # ===========================
 FROM eclipse-temurin:17-jre
 
-# Set working directory
 WORKDIR /app
 
-# Copy the built jar from the build stage
+# Copy the built jar
 COPY --from=build /app/target/*.jar app.jar
 
-# Expose the port your app listens on
 EXPOSE 8080
 
-# Command to run the app
 CMD ["java", "-jar", "app.jar"]
